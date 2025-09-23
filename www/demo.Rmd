@@ -1,0 +1,25 @@
+## 圆的面积公式
+
+$$
+S = \pi r^2
+$$
+
+## 画单位圆
+
+```{r}
+opar = par(no.readonly = TRUE)
+on.exit(par(opar), add = TRUE)
+par(pty = "s")  # 保持 1:1 比例
+theta = seq(0, 2 * pi, length.out = 100)
+x = cos(theta); y = sin(theta)
+plot(x, y, type = "l", bty = "n")
+```
+
+## 计算圆的面积
+
+```{r}
+# 变量 a 为圆的半径
+a = 1
+```
+
+当圆的半径为 `r a` 时，圆的面积为 `r pi * a^2`。修改代码块里 `a` 的值试试看。
