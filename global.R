@@ -7,3 +7,4 @@
 # 加载相关 R 包
 library(shiny)
 library(shinyAce)
+library(shinyjs)

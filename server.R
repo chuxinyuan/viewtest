@@ -5,44 +5,24 @@ server = function(input, output, session) {
     }
     
     tryCatch({
-      tags$div(
-        class = "text-center",
-        tags$p("正在渲染预览..."),
-        tags$div(class = "spinner-border", role = "status")
-      )
-      
-      # 创建临时 Rmd 文件并写入用户输入内容
+      # 创建临时 Rmd 文件和 HTML 文件
       temp_file = tempfile(fileext = ".Rmd")
       on.exit(unlink(temp_file), add = TRUE)
-      yaml = c("---\noutput: html\n---\n\n", "")
-      content = paste0(yaml[2], input$content)
-      writeLines(content, temp_file)
-      litedown:::convert_knitr(temp_file)
-
-      # 渲染 Rmd 为 HTML
       temp_html = tempfile(fileext = ".html")
-      on.exit(unlink(temp_file), add = TRUE)
+      on.exit(unlink(temp_html), add = TRUE)
+      
+      # 渲染 Rmd 为 HTML 片段
+      writeLines(input$content, temp_file)
+      litedown:::convert_knitr(temp_file)
       litedown::fuse(temp_file, temp_html, quiet = TRUE)
       
-      # # 创建临时 Rmd 文件
-      # temp_file = tempfile(fileext = ".Rmd")
-      # on.exit(unlink(temp_file), add = TRUE)
-      # writeLines(input$content, temp_file)
-      # on.exit(unlink(temp_file), add = TRUE)
-      # 
-      # # 渲染 Rmd 文件为 HTML
-      # temp_html = tempfile(fileext = ".html")
-      # on.exit(unlink(temp_html), add = TRUE)
-      # rmarkdown::render(
-      #   input = temp_file,
-      #   output_file = temp_html,
-      #   output_options = list(highlight = 'kate'),
-      #   quiet = TRUE
-      # )
-      
-      # 读取并返回 HTML 内容
+      # HTML 里注入语法高亮和数学公式渲染代码
       html_content = paste(
-        readLines(temp_html, warn = FALSE),
+        c(
+          readLines("www/head.html", warn = FALSE),
+          readLines(temp_html, warn = FALSE),
+          readLines("www/foot.html", warn = FALSE)
+        ),
         collapse = "\n"
       )
       
