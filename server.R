@@ -16,17 +16,16 @@ server = function(input, output, session) {
       litedown:::convert_knitr(temp_file)
       litedown::fuse(temp_file, temp_html, quiet = TRUE)
       
-      # HTML 片段里注入语法高亮和数学公式渲染代码
+      # HTML 片段里注入代码高亮和数学公式渲染代码
       html_content = paste(
         c(
-          readLines("www/head.html", warn = FALSE),
           readLines(temp_html, warn = FALSE),
           readLines("www/foot.html", warn = FALSE)
         ),
         collapse = "\n"
       )
       
-      # 渲染 HTML 文件，加入 preview id 方便定制
+      # 渲染 HTML 片段，加入 preview id 方便定制
       tags$div(id = "preview", HTML(html_content))
     }, error = function(e) {
       # 显示错误信息

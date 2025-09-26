@@ -1,17 +1,14 @@
-</div>
-<!-- 正文结束 -->
-
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css"> 
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@xiee/utils@1.14.14/css/prism-xcode.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/contrib/auto-render.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/@xiee/utils@1.14.14/js/render-katex.min.js" defer></script> 
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js" defer></script> 
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js" defer></script>
 <script>
   document.addEventListener("DOMContentLoaded", function () {
-    renderMathInElement(document.getElementById("content"), {
-      delimiters: [
-        {left: "$$", right: "$$", display: true},   // 行间公式
-        {left: "\\(", right: "\\)", display: false} // 行内公式
-      ],
+    renderMathInElement(document.body, {
       throwOnError: false
     });
   });
 </script>
-
-</body>
-</html>
