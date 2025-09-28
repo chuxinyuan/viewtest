@@ -1,5 +1,7 @@
 server = function(input, output, session) {
-  output$preview = renderUI({
+  values = reactiveValues(ready = FALSE)
+  
+  observeEvent(input$content, {
     if (nchar(input$content) == 0) {
       return(tags$p("请在编辑页输入内容再进行预览", class = "text-muted"))
     }
@@ -18,15 +20,17 @@ server = function(input, output, session) {
       
       # HTML 片段里注入代码高亮和数学公式渲染代码
       html_content = paste(
-        c(
-          readLines(temp_html, warn = FALSE),
-          readLines("www/foot.html", warn = FALSE)
-        ),
+        readLines(temp_html, warn = FALSE),
         collapse = "\n"
       )
       
+      # HTML 片段准备就绪
+      values$ready = TRUE
+      
       # 渲染 HTML 片段，加入 preview id 方便定制
-      tags$div(id = "preview", HTML(html_content))
+      output$preview = renderUI({
+        tags$div(id = "preview", HTML(html_content))
+      })
     }, error = function(e) {
       # 显示错误信息
       tags$div(
@@ -35,6 +39,13 @@ server = function(input, output, session) {
         tags$p(e$message),
         tags$p("请检查您的 R 代码语法是否正确")
       )
+    })
+    
+    # 一旦 HTML 片段准备就绪就通知前端渲染公式和代码块
+    observe({
+      if (values$ready) {
+        session$sendCustomMessage("render_ready", list(status = "ok"))
+      }
     })
   })
 }

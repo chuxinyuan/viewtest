@@ -1,4 +1,34 @@
 ui = fluidPage(
+  tags$head(
+    tags$link(rel = "stylesheet", href = "https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css"),
+    tags$link(rel = "stylesheet", href = "https://cdn.jsdelivr.net/npm/@xiee/utils@1.14.14/css/prism-xcode.min.css")
+  ),
+  tags$script(src = "https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.js"),
+  tags$script(src = "https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/contrib/auto-render.min.js"),
+  tags$script(src = "https://cdn.jsdelivr.net/npm/@xiee/utils@1.14.14/js/render-katex.min.js"),
+  tags$script(src = "https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js"),
+  tags$script(src = "https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"),
+  
+  # 自定义消息处理器：在收到消息时触发渲染
+  singleton(tags$script(HTML("
+    Shiny.addCustomMessageHandler('render_ready', function(message) {
+      const previewEl = document.body;
+      if (!previewEl) return;
+
+      // 1. 使用 renderMathInElement 渲染数学公式
+      if (typeof renderMathInElement === 'function') {
+        renderMathInElement(previewEl, {
+          throwOnError: false,
+        });
+      }
+
+      // 2. 使用 Prism.highlightAll() 高亮代码
+      if (typeof Prism !== 'undefined' && typeof Prism.highlightAll === 'function') {
+        Prism.highlightAll();
+      }
+    });
+  "))),
+  
   fluidRow(
     column(
       width = 12,
@@ -13,12 +43,9 @@ ui = fluidPage(
               mode = "markdown",
               fontSize = 16,
               placeholder = "",
-              value = paste(
-                readLines("www/demo.Rmd"), 
-                collapse = "\n"
-              ),
-              wordWrap = "soft",  # 启用自动视觉换行
-              height = "600px",
+              value = paste(readLines("www/demo.Rmd"), collapse = "\n"),
+              wordWrap = "soft",
+              height = "600px"
             )
           ),
           tabPanel(
