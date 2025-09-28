@@ -1,12 +1,7 @@
 server = function(input, output, session) {
-  values = reactiveValues(ready = FALSE)
+  values = reactiveValues()
 
   observeEvent(input$content, {
-    if (nchar(input$content) == 0) {
-      rendered_html(tags$p("请在编辑页输入内容再进行预览", class = "text-muted"))
-      return()
-    }
-    
     tryCatch({
       temp_file = tempfile(fileext = ".Rmd")
       on.exit(unlink(temp_file), add = TRUE)
@@ -26,21 +21,26 @@ server = function(input, output, session) {
         tags$div(id = "preview", HTML(html_fragment))
       })
       
-      values$ready = TRUE
       values$html_fragment = html_fragment
     }, error = function(e) {
       tags$div(
         class = "alert alert-danger",
         tags$h4("渲染出错："),
-        tags$p(e$message),
-        tags$p("请检查您的 R 代码语法是否正确")
+        tags$p(e$message)
       )
     })
   })
   
-  observe({
-    if (values$ready == TRUE) {
-      session$sendCustomMessage("render_ready", list())
-    }
+  observeEvent(values$html_fragment, {
+    req(values$html_fragment)
+    shinyjs::delay(1000, {
+      runjs("
+        const el = document.getElementById('preview');
+        if (el) {
+          renderMathInElement(el, {throwOnError: false});
+          Prism.highlightAllUnder(el);
+        }
+      ")
+    })
   })
 }
