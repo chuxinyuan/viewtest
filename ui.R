@@ -12,19 +12,17 @@ ui = fluidPage(
   # 自定义消息处理器：在收到消息时触发渲染
   singleton(tags$script(HTML("
     Shiny.addCustomMessageHandler('render_ready', function(message) {
-      const previewEl = document.body;
+      const previewEl = document.getElementById('preview'); 
       if (!previewEl) return;
-
-      // 1. 使用 renderMathInElement 渲染数学公式
+      // 1. 渲染数学公式
       if (typeof renderMathInElement === 'function') {
         renderMathInElement(previewEl, {
           throwOnError: false,
         });
       }
-
-      // 2. 使用 Prism.highlightAll() 高亮代码
+      // 2. 高亮代码
       if (typeof Prism !== 'undefined' && typeof Prism.highlightAll === 'function') {
-        Prism.highlightAll();
+        Prism.highlightAllUnder(previewEl);
       }
     });
   "))),
