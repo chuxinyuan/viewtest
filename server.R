@@ -3,20 +3,11 @@ server = function(input, output, session) {
 
   observeEvent(input$content, {
     tryCatch({
-      temp_file = tempfile(fileext = ".Rmd")
-      on.exit(unlink(temp_file), add = TRUE)
-      temp_html = tempfile(fileext = ".html")
-      on.exit(unlink(temp_html), add = TRUE)
-      
-      writeLines(input$content, temp_file)
-      litedown:::convert_knitr(temp_file)
-      litedown::fuse(temp_file, temp_html, quiet = TRUE)
-      
-      html_fragment = paste(
-        readLines(temp_html, warn = FALSE), 
-        collapse = "\n"
+      content = gsub(
+        '(?<!(^``))(?<!(\n``))`r[ #]([^`]+)\\s*`', 
+        '`{r} \\3`', input$content, perl = TRUE
       )
-      
+      html_fragment = litedown::fuse(text = content)
       output$preview = renderUI({
         tags$div(id = "preview", HTML(html_fragment))
       })
@@ -33,7 +24,7 @@ server = function(input, output, session) {
   
   observeEvent(values$html_fragment, {
     req(values$html_fragment)
-    shinyjs::delay(1000, {
+    shinyjs::delay(2000, {
       runjs("
         const el = document.getElementById('preview');
         if (el) {
