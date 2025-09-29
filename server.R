@@ -3,15 +3,10 @@ server = function(input, output, session) {
 
   observeEvent(input$content, {
     tryCatch({
-      content = gsub(
-        '(?<!(^``))(?<!(\n``))`r[ #]([^`]+)\\s*`', 
-        '`{r} \\3`', input$content, perl = TRUE
-      )
-      html_fragment = litedown::fuse(text = content)
+      html_fragment = litedown::fuse(text = input$content)
       output$preview = renderUI({
         tags$div(id = "preview", HTML(html_fragment))
       })
-      
       values$html_fragment = html_fragment
     }, error = function(e) {
       tags$div(
