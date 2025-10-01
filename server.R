@@ -1,12 +1,19 @@
 server = function(input, output, session) {
   values = reactiveValues()
-
+  
   observeEvent(input$content, {
     tryCatch({
-      html_fragment = litedown::fuse(text = input$content)
+      content = input$content
+      html_fragment = ifelse(
+        use_fuse(content), 
+        fuse(text = content), 
+        mark(text = content)
+      )
+      
       output$preview = renderUI({
         tags$div(id = "preview", HTML(html_fragment))
       })
+      
       values$html_fragment = html_fragment
     }, error = function(e) {
       tags$div(
@@ -19,7 +26,7 @@ server = function(input, output, session) {
   
   observeEvent(values$html_fragment, {
     req(values$html_fragment)
-    shinyjs::delay(2000, {
+    shinyjs::delay(1000, {
       runjs("
         const el = document.getElementById('preview');
         if (el) {
