@@ -3,15 +3,7 @@ server = function(input, output, session) {
   
   observeEvent(input$content, {
     tryCatch({
-      content = input$content
-      if (!use_fuse(content)) {
-        html_fragment = litedown::mark(text = content)
-      } else {
-        r = "(?<!(^``))(?<!(\n``))`r[ #]([^`]+)\\s*`"
-        content = gsub(r, "`{r} \\3`", content, perl = TRUE)
-        html_fragment = litedown::fuse(text = content)
-      }
-      
+      html_fragment = litedown::fuse(text = input$content)
       output$preview = renderUI({
         tags$div(id = "preview", HTML(html_fragment))
       })
@@ -28,7 +20,7 @@ server = function(input, output, session) {
   
   observeEvent(values$html_fragment, {
     req(values$html_fragment)
-    shinyjs::delay(1000, {
+    shinyjs::delay(2000, {
       runjs("
         const el = document.getElementById('preview');
         if (el) {
